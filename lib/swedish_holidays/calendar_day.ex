@@ -224,62 +224,72 @@ defmodule SwedishHolidays.CalendarDay do
 
   def matching_filters(calendar_day) do
     matching = [day_filters[:any_day]]
-    date = calendar_day.date
 
-    if calendar_day.red_day && Date.weekday(date) != 7 do
+    if is_red_day_not_sunday(calendar_day) do
       matching = [day_filters[:red_day_not_sunday] | matching]
     end
 
-    if calendar_day.red_day do
+    if is_red_day(calendar_day) do
       matching = [day_filters[:red_day] | matching]
     end
 
-    yesterday = CalendarDay.find(Date.subtract(date, Time.to_timestamp(1, :days)))
-
-    if yesterday.red_day do
+    if is_day_after_red_day(calendar_day) do
       matching = [day_filters[:day_after_red_day] | matching]
     end
 
-    tomorrow = CalendarDay.find(Date.add(date, Time.to_timestamp(1, :days)))
-
-    if tomorrow.red_day do
+    if is_day_before_red_day(calendar_day) do
       matching = [day_filters[:day_before_red_day] | matching]
     end
 
-    if yesterday.red_day && Date.weekday(date) == 5 do
+    if is_day_before_red_day(calendar_day) do
+      matching = [day_filters[:day_before_red_day] | matching]
+    end
+
+    if is_friday_after_red_day(calendar_day) do
       matching = [day_filters[:friday_after_red_day] | matching]
     end
 
-    if tomorrow.red_day && Date.weekday(date) == 1 do
+    if is_monday_before_red_day(calendar_day) do
       matching = [day_filters[:monday_before_red_day] | matching]
     end
 
-    case Date.weekday(date) do
-      2 ->
-        matching = [day_filters[:tuesday] | matching]
-      3 ->
-        matching = [day_filters[:wednesday] | matching]
-      4 ->
-        matching = [day_filters[:thursday] | matching]
-      5 ->
-        matching = [day_filters[:friday] | matching]
-      6 ->
-        matching = [day_filters[:saturday] | matching]
-      7 ->
-        matching = [day_filters[:sunday] | matching]
-      _ ->
-        matching = [day_filters[:monday] | matching]
+    if is_monday(calendar_day) do
+      matching = [day_filters[:monday] | matching]
     end
 
-    if is_monday_to_thursday(date) do
+    if is_tuesday(calendar_day) do
+      matching = [day_filters[:tuesday] | matching]
+    end
+
+    if is_wednesday(calendar_day) do
+      matching = [day_filters[:wednesday] | matching]
+    end
+
+    if is_thurday(calendar_day) do
+      matching = [day_filters[:thursday] | matching]
+    end
+
+    if is_friday(calendar_day) do
+      matching = [day_filters[:friday] | matching]
+    end
+
+    if is_saturday(calendar_day) do
+      matching = [day_filters[:saturday] | matching]
+    end
+
+    if is_sunday(calendar_day) do
+      matching = [day_filters[:sunday] | matching]
+    end
+
+    if is_monday_to_thursday(calendar_day) do
       matching = [day_filters[:monday_to_thursday] | matching]
     end
 
-    if is_weekday(date) do
+    if is_weekday(calendar_day) do
       matching = [day_filters[:weekday] | matching]
     end
 
-    if is_weekend(date) do
+    if is_weekend(calendar_day) do
       matching = [day_filters[:weekend] | matching]
     end
 
@@ -295,18 +305,78 @@ defmodule SwedishHolidays.CalendarDay do
     "#{formatted_date}, code: #{calendar_day.code}, red_day: #{calendar_day.red_day}"
   end
 
-  defp is_weekday(date) do
-    weekday = Date.weekday(date)
+  defp is_monday(calendar_day) do
+    Date.weekday(calendar_day.date) == 1
+  end
+
+  defp is_tuesday(calendar_day) do
+    Date.weekday(calendar_day.date) == 2
+  end
+
+  defp is_wednesday(calendar_day) do
+    Date.weekday(calendar_day.date) == 3
+  end
+
+  defp is_thurday(calendar_day) do
+    Date.weekday(calendar_day.date) == 4
+  end
+
+  defp is_friday(calendar_day) do
+    Date.weekday(calendar_day.date) == 5
+  end
+
+  defp is_saturday(calendar_day) do
+    Date.weekday(calendar_day.date) == 6
+  end
+
+  defp is_sunday(calendar_day) do
+    Date.weekday(calendar_day.date) == 7
+  end
+
+  defp is_monday_before_red_day(calendar_day) do
+    next_calendar_day(calendar_day).red_day && Date.weekday(calendar_day.date) == 1
+  end
+
+  defp is_friday_after_red_day(calendar_day) do
+    previous_calendar_day(calendar_day).red_day && Date.weekday(calendar_day.date) == 5
+  end
+
+  defp is_day_before_red_day(calendar_day) do
+    next_calendar_day(calendar_day).red_day
+  end
+
+  defp is_day_after_red_day(calendar_day) do
+    previous_calendar_day(calendar_day).red_day
+  end
+
+  defp is_red_day(calendar_day) do
+    calendar_day.red_day
+  end
+
+  defp is_red_day_not_sunday(calendar_day) do
+    calendar_day.red_day && Date.weekday(calendar_day.date) != 7
+  end
+
+  defp is_weekday(calendar_day) do
+    weekday = Date.weekday(calendar_day.date)
     weekday >= 1 && weekday <= 5
   end
 
-  defp is_monday_to_thursday(date) do
-    weekday = Date.weekday(date)
+  defp is_monday_to_thursday(calendar_day) do
+    weekday = Date.weekday(calendar_day.date)
     weekday >= 1 && weekday <= 4
   end
 
-  defp is_weekend(date) do
-    Date.weekday(date) >= 6
+  defp is_weekend(calendar_day) do
+    Date.weekday(calendar_day.date) >= 6
+  end
+
+  defp previous_calendar_day(calendar_day) do
+    CalendarDay.find(Date.subtract(calendar_day.date, Time.to_timestamp(1, :days)))
+  end
+
+  defp next_calendar_day(calendar_day) do
+    CalendarDay.find(Date.add(calendar_day.date, Time.to_timestamp(1, :days)))
   end
 
   defp other(date) do

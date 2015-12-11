@@ -469,4 +469,12 @@ defmodule CalendarDayTest do
     assert Enum.count(matches) == 1
   end
 
+  test "to string" do
+    string =
+      swedish_date(2015, 12, 10)
+      |> CalendarDay.find
+      |> CalendarDay.to_string
+
+    assert string == "2015-12-10, code: thursday, red_day: false"
+  end
 end
