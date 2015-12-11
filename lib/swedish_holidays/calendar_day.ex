@@ -265,7 +265,7 @@ defmodule SwedishHolidays.CalendarDay do
       matching = [day_filters[:wednesday] | matching]
     end
 
-    if is_thurday(calendar_day) do
+    if is_thursday(calendar_day) do
       matching = [day_filters[:thursday] | matching]
     end
 
@@ -317,7 +317,7 @@ defmodule SwedishHolidays.CalendarDay do
     Date.weekday(calendar_day.date) == 3
   end
 
-  defp is_thurday(calendar_day) do
+  defp is_thursday(calendar_day) do
     Date.weekday(calendar_day.date) == 4
   end
 
@@ -334,11 +334,13 @@ defmodule SwedishHolidays.CalendarDay do
   end
 
   defp is_monday_before_red_day(calendar_day) do
-    next_calendar_day(calendar_day).red_day && Date.weekday(calendar_day.date) == 1
+    next_calendar_day(calendar_day).red_day &&
+      Date.weekday(calendar_day.date) == 1
   end
 
   defp is_friday_after_red_day(calendar_day) do
-    previous_calendar_day(calendar_day).red_day && Date.weekday(calendar_day.date) == 5
+    previous_calendar_day(calendar_day).red_day &&
+      Date.weekday(calendar_day.date) == 5
   end
 
   defp is_day_before_red_day(calendar_day) do
@@ -354,7 +356,8 @@ defmodule SwedishHolidays.CalendarDay do
   end
 
   defp is_red_day_not_sunday(calendar_day) do
-    calendar_day.red_day && Date.weekday(calendar_day.date) != 7
+    calendar_day.red_day
+      && Date.weekday(calendar_day.date) != 7
   end
 
   defp is_weekday(calendar_day) do
