@@ -109,28 +109,51 @@ defmodule SwedishHolidays.CalendarDay do
     date = easter_day(year).date
     |> Date.subtract(Time.to_timestamp(1, :days))
 
-    create(:easter_eve, date, true)
+    create(:easter_eve, date, false)
   end
 
   def easter_day(year) do
-    a = rem(year, 19)
-    b = div(year, 100)
-    c = rem(year, 100)
-    d = div(b, 4)
-    e = rem(b, 4)
-    f = div(b + 8, 25)
-    g = div(b - f + 1, 3)
-    h = rem(19 * a + b - d - g + 15, 30)
-    i = div(c, 4)
-    k = rem(c, 4)
-    l = rem(32 + 2 * e + 2 * i - h - k, 7)
-    m = div((a + 11 * h + 22 * l), 451)
-    x = h + l - 7 * m + 114
-    month = div(x, 31)
-    day = rem(x, 31) + 1
+    day = 0;
+    month = 0;
+
+    g = rem(year, 19)
+    c = div(year, 100)
+    j = (c - div(c, 4) - div((8 * c + 13), 25) + 19 * g + 15)
+
+
+    h = rem(j, 30)
+    i = h - div(h, 28) * (1 - div(h, 28) * div(29, (h + 1)) * div((21 - g), 11))
+
+    day   = i - rem((year + div(year, 4) + i + 2 - c + div(c, 4)), 7) + 28
+    month = 3
+
+    if (day > 31) do
+      month = month + 1
+      day = day - 31
+    end
 
     create(:easter_day, swedish_date(year, month, day), true)
   end
+
+  # def easter_day(year) do
+  #   a = rem(year, 19)
+  #   b = div(year, 100)
+  #   c = rem(year, 100)
+  #   d = div(b, 4)
+  #   e = rem(b, 4)
+  #   f = div(b + 8, 25)
+  #   g = div(b - f + 1, 3)
+  #   h = rem(19 * a + b - d - g + 15, 30)
+  #   i = div(c, 4)
+  #   k = rem(c, 4)
+  #   l = rem(32 + 2 * e + 2 * i - h - k, 7)
+  #   m = div((a + 11 * h + 22 * l), 451)
+  #   x = h + l - 7 * m + 114
+  #   month = div(x, 31)
+  #   day = rem(x, 31) + 1
+  #
+  #   create(:easter_day, swedish_date(year, month, day), true)
+  # end
 
   def easter_monday(year) do
     date = easter_day(year).date

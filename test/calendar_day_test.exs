@@ -99,7 +99,7 @@ defmodule CalendarDayTest do
 
     assert day.code == :easter_eve
     assert day.date == swedish_date(2015, 4, 4)
-    assert day.red_day == true
+    assert day.red_day == false
   end
 
   test "all" do
@@ -145,7 +145,7 @@ defmodule CalendarDayTest do
 
     assert day.code == :easter_eve
     assert day.date == swedish_date(2015, 4, 4)
-    assert day.red_day == true
+    assert day.red_day == false
   end
 
   test "easter day 2015" do
@@ -153,6 +153,14 @@ defmodule CalendarDayTest do
 
     assert day.code == :easter_day
     assert day.date == swedish_date(2015, 4, 5)
+    assert day.red_day == true
+  end
+
+  test "easter day 2016" do
+    day = CalendarDay.easter_day(2016)
+
+    assert day.code == :easter_day
+    assert day.date == swedish_date(2016, 3, 27)
     assert day.red_day == true
   end
 
@@ -407,7 +415,6 @@ defmodule CalendarDayTest do
 
     assert 1800 in matching
     assert 1700 in matching
-    assert 1200 in matching
     assert 600 in matching
     assert 200 in matching
     assert 0 in matching
