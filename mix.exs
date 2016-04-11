@@ -30,7 +30,9 @@ defmodule SwedishHolidays.Mixfile do
   defp deps do
     [
       {:timex, "> 0.0.0"},
-      {:coverex, "> 0.0.0"}
+      {:coverex, "> 0.0.0"},
+      {:credo, "> 0.0.0"},
+      {:dialyxir, "~> 0.3", only: [:dev, :test]}
     ]
   end
 end

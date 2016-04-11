@@ -1,5 +1,5 @@
 defmodule SwedishHolidays do
-  use Timex
+
 
   def day_filters do
     %{
@@ -21,9 +21,5 @@ defmodule SwedishHolidays do
       :weekend => 100,
       :any_day => 0
     }
-  end
-
-  def swedish_date(year, month, day) do
-    Date.from({{year, month, day}, {0, 0, 0}}, "Europe/Stockholm")
   end
 end
