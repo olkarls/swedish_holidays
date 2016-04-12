@@ -1,6 +1,5 @@
 defmodule CalendarDayTest do
   use ExUnit.Case
-  import SwedishHolidays
   alias SwedishHolidays.CalendarDay
 
   test "struct" do
@@ -330,11 +329,11 @@ defmodule CalendarDayTest do
       |> CalendarDay.find
       |> CalendarDay.matching_filters
 
-    assert 0 in matching
-    assert 200 in matching
-    assert 300 in matching
-    assert 1000 in matching
-    assert 1100 in matching
+    assert FilterCriteria.any_day in matching
+    assert FilterCriteria.weekday in matching
+    assert FilterCriteria.monday_to_thursday in matching
+    assert FilterCriteria.day_after_red_day in matching
+    assert FilterCriteria.monday in matching
   end
 
   test "matches on tuesday" do
@@ -343,10 +342,10 @@ defmodule CalendarDayTest do
       |> CalendarDay.find
       |> CalendarDay.matching_filters
 
-    assert 0 in matching
-    assert 200 in matching
-    assert 300 in matching
-    assert 900 in matching
+    assert FilterCriteria.any_day in matching
+    assert FilterCriteria.weekday in matching
+    assert FilterCriteria.monday_to_thursday in matching
+    assert FilterCriteria.tuesday in matching
   end
 
   test "matches on wednesday" do
@@ -355,10 +354,10 @@ defmodule CalendarDayTest do
       |> CalendarDay.find
       |> CalendarDay.matching_filters
 
-    assert 0 in matching
-    assert 200 in matching
-    assert 300 in matching
-    assert 800 in matching
+    assert FilterCriteria.any_day in matching
+    assert FilterCriteria.weekday in matching
+    assert FilterCriteria.monday_to_thursday in matching
+    assert FilterCriteria.wednesday in matching
   end
 
   test "matches on thursday" do
@@ -367,10 +366,10 @@ defmodule CalendarDayTest do
       |> CalendarDay.find
       |> CalendarDay.matching_filters
 
-    assert 0 in matching
-    assert 200 in matching
-    assert 300 in matching
-    assert 700 in matching
+    assert FilterCriteria.any_day in matching
+    assert FilterCriteria.weekday in matching
+    assert FilterCriteria.thursday in matching
+    assert FilterCriteria.monday_to_thursday in matching
   end
 
   test "matches on friday" do
@@ -379,9 +378,9 @@ defmodule CalendarDayTest do
       |> CalendarDay.find
       |> CalendarDay.matching_filters
 
-    assert 0 in matching
-    assert 200 in matching
-    assert 600 in matching
+    assert FilterCriteria.any_day in matching
+    assert FilterCriteria.weekday in matching
+    assert FilterCriteria.friday in matching
   end
 
   test "matches on saturday" do
@@ -390,10 +389,11 @@ defmodule CalendarDayTest do
       |> CalendarDay.find
       |> CalendarDay.matching_filters
 
-    assert 0 in matching
-    assert 100 in matching
-    assert 500 in matching
-    assert 1200 in matching
+      assert FilterCriteria.any_day in matching
+      assert FilterCriteria.weekend in matching
+      assert FilterCriteria.saturday in matching
+      assert FilterCriteria.day_before_red_day in matching
+      assert Enum.count(matching) == 4
   end
 
   test "matches on sunday" do
@@ -402,10 +402,11 @@ defmodule CalendarDayTest do
       |> CalendarDay.find
       |> CalendarDay.matching_filters
 
-    assert 0 in matching
-    assert 100 in matching
-    assert 400 in matching
-    assert 1700 in matching
+      assert FilterCriteria.any_day in matching
+      assert FilterCriteria.weekend in matching
+      assert FilterCriteria.sunday in matching
+      assert FilterCriteria.red_day in matching
+      assert Enum.count(matching) == 4
   end
 
   test "matches on good_friday" do
@@ -413,11 +414,11 @@ defmodule CalendarDayTest do
       CalendarDay.good_friday(2015)
       |> CalendarDay.matching_filters
 
-    assert 1800 in matching
-    assert 1700 in matching
-    assert 600 in matching
-    assert 200 in matching
-    assert 0 in matching
+    assert FilterCriteria.red_day_not_sunday in matching
+    assert FilterCriteria.red_day in matching
+    assert FilterCriteria.friday in matching
+    assert FilterCriteria.weekday in matching
+    assert FilterCriteria.any_day in matching
   end
 
   test "friday after red day" do
@@ -426,7 +427,7 @@ defmodule CalendarDayTest do
       |> CalendarDay.find
       |> CalendarDay.matching_filters
 
-    assert 1400 in matching
+    assert FilterCriteria.friday_after_red_day in matching
   end
 
   test "monday before red day" do
@@ -435,7 +436,7 @@ defmodule CalendarDayTest do
       |> CalendarDay.find
       |> CalendarDay.matching_filters
 
-    assert 1300 in matching
+    assert FilterCriteria.monday_before_red_day in matching
   end
 
   test "day is matching filter" do
@@ -443,7 +444,7 @@ defmodule CalendarDayTest do
       SwedishDate.new(2015, 12, 10)
       |> CalendarDay.find
 
-    assert CalendarDay.matches?(day, day_filters[:thursday]) == true
+    assert CalendarDay.matches?(day, FilterCriteria.thursday)
   end
 
   test "day is not matching filter" do
@@ -451,7 +452,23 @@ defmodule CalendarDayTest do
       SwedishDate.new(2015, 12, 10)
       |> CalendarDay.find
 
-    assert CalendarDay.matches?(day, day_filters[:weekend]) == false
+    refute CalendarDay.matches?(day, FilterCriteria.weekend)
+  end
+
+  test "day_after_red_day_not_monday" do
+    day =
+      SwedishDate.new(2016, 03, 29)
+      |> CalendarDay.find
+
+    assert CalendarDay.matches?(day, FilterCriteria.day_after_red_day_not_monday)
+  end
+
+  test "day_before_red_day_not_saturday" do
+    day =
+      SwedishDate.new(2016, 05, 4)
+      |> CalendarDay.find
+
+    assert CalendarDay.matches?(day, FilterCriteria.day_before_red_day_not_saturday)
   end
 
   test "filter day range by any match" do
@@ -459,7 +476,7 @@ defmodule CalendarDayTest do
     to = SwedishDate.new(2016, 01, 31)
 
     days = CalendarDay.find(from, to)
-    filters = [day_filters[:day_after_red_day], day_filters[:red_day_not_sunday]]
+    filters = [FilterCriteria.day_after_red_day, FilterCriteria.red_day_not_sunday]
     matches = CalendarDay.match_any(days, filters)
 
     assert Enum.count(matches) == 8
@@ -470,7 +487,7 @@ defmodule CalendarDayTest do
     to = SwedishDate.new(2016, 01, 31)
 
     days = CalendarDay.find(from, to)
-    filters = [day_filters[:friday], day_filters[:red_day_not_sunday]]
+    filters = [FilterCriteria.friday, FilterCriteria.red_day_not_sunday]
     matches = CalendarDay.match_all(days, filters)
 
     assert Enum.count(matches) == 1

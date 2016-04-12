@@ -1,7 +1,4 @@
 defmodule SwedishHolidays.CalendarDay do
-  import SwedishHolidays
-  import Timex
-
   alias Timex.Time
   alias Timex.Date
   alias SwedishHolidays.CalendarDay
@@ -16,11 +13,10 @@ defmodule SwedishHolidays.CalendarDay do
       |> Enum.filter(fn(d) -> d.date == date end)
       |> List.first
 
-    cond do
-      day == nil ->
-        other(date)
-      true ->
-        day
+    unless day do
+      other(date)
+    else
+      day
     end
   end
 
@@ -221,74 +217,78 @@ defmodule SwedishHolidays.CalendarDay do
   end
 
   def matching_filters(calendar_day) do
-    matching = [day_filters[:any_day]]
+    matching = [FilterCriteria.any_day]
+
+    if is_day_after_red_day_not_monday(calendar_day) do
+      matching = [FilterCriteria.day_after_red_day_not_monday | matching]
+    end
+
+    if is_day_before_red_day_not_saturday(calendar_day) do
+      matching = [FilterCriteria.day_before_red_day_not_saturday | matching]
+    end
 
     if is_red_day_not_sunday(calendar_day) do
-      matching = [day_filters[:red_day_not_sunday] | matching]
+      matching = [FilterCriteria.red_day_not_sunday | matching]
     end
 
     if is_red_day(calendar_day) do
-      matching = [day_filters[:red_day] | matching]
+      matching = [FilterCriteria.red_day | matching]
     end
 
     if is_day_after_red_day(calendar_day) do
-      matching = [day_filters[:day_after_red_day] | matching]
+      matching = [FilterCriteria.day_after_red_day | matching]
     end
 
     if is_day_before_red_day(calendar_day) do
-      matching = [day_filters[:day_before_red_day] | matching]
-    end
-
-    if is_day_before_red_day(calendar_day) do
-      matching = [day_filters[:day_before_red_day] | matching]
+      matching = [FilterCriteria.day_before_red_day | matching]
     end
 
     if is_friday_after_red_day(calendar_day) do
-      matching = [day_filters[:friday_after_red_day] | matching]
+      matching = [FilterCriteria.friday_after_red_day | matching]
     end
 
     if is_monday_before_red_day(calendar_day) do
-      matching = [day_filters[:monday_before_red_day] | matching]
+      matching = [FilterCriteria.monday_before_red_day | matching]
     end
 
     if is_monday(calendar_day) do
-      matching = [day_filters[:monday] | matching]
+      matching = [FilterCriteria.monday | matching]
     end
 
     if is_tuesday(calendar_day) do
-      matching = [day_filters[:tuesday] | matching]
+      matching = [FilterCriteria.tuesday | matching]
     end
 
     if is_wednesday(calendar_day) do
-      matching = [day_filters[:wednesday] | matching]
+      matching = [FilterCriteria.wednesday | matching]
     end
 
     if is_thursday(calendar_day) do
-      matching = [day_filters[:thursday] | matching]
+      matching = [FilterCriteria.thursday | matching]
     end
 
     if is_friday(calendar_day) do
-      matching = [day_filters[:friday] | matching]
+      matching = [FilterCriteria.friday | matching]
     end
 
     if is_saturday(calendar_day) do
-      matching = [day_filters[:saturday] | matching]
+      matching = [FilterCriteria.saturday | matching]
     end
 
     if is_sunday(calendar_day) do
-      matching = [day_filters[:sunday] | matching]
+      matching = [FilterCriteria.sunday | matching]
     end
 
     if is_monday_to_thursday(calendar_day) do
-      matching = [day_filters[:monday_to_thursday] | matching]
+      matching = [FilterCriteria.monday_to_thursday | matching]
     end
 
     if is_weekday(calendar_day) do
-      matching = [day_filters[:weekday] | matching]
+      matching = [FilterCriteria.weekday | matching]
     end
 
     if is_weekend(calendar_day) do
-      matching = [day_filters[:weekend] | matching]
+      matching = [FilterCriteria.weekend | matching]
     end
 
     matching
@@ -339,6 +339,16 @@ defmodule SwedishHolidays.CalendarDay do
   defp is_friday_after_red_day(calendar_day) do
     previous_calendar_day(calendar_day).red_day &&
       Timex.weekday(calendar_day.date) == 5
+  end
+
+  defp is_day_after_red_day_not_monday(calendar_day) do
+    previous_calendar_day(calendar_day).red_day &&
+      Timex.weekday(calendar_day.date) != 1
+  end
+
+  defp is_day_before_red_day_not_saturday(calendar_day) do
+    next_calendar_day(calendar_day).red_day &&
+      Timex.weekday(calendar_day.date) != 6
   end
 
   defp is_day_before_red_day(calendar_day) do
