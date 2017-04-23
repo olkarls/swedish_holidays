@@ -1,10 +1,15 @@
 defmodule SwedishHolidays.CalendarDay do
-  alias Timex.Time
-  alias Timex.Date
+  @moduledoc """
+  """
+
   alias SwedishHolidays.CalendarDay
-  alias SwedishDate
 
   defstruct code: nil, date: nil, red_day: nil
+
+  def find(year, month, day) do
+    Timex.to_date({year, month, day})
+    |> find
+  end
 
   @spec find(Timex.Date) :: %CalendarDay{}
   def find(date) do
@@ -13,17 +18,17 @@ defmodule SwedishHolidays.CalendarDay do
       |> Enum.filter(fn(d) -> d.date == date end)
       |> List.first
 
-    unless day do
-      other(date)
-    else
-      day
+    case day do
+      nil -> other(date)
+      true -> day
     end
   end
 
+  @spec find(Timex.Date, Timex.Date) :: [%CalendarDay{}]
   def find(from, to) do
-    0..Date.diff(from, to, :days)
+    0..Timex.diff(from, to, :days)
     |> Enum.map(fn(n) ->
-      find(Timex.add(from, Time.to_timestamp(n, :days)))
+      find(Timex.add(from, Timex.Duration.from_days(n)))
     end)
   end
 
@@ -81,30 +86,30 @@ defmodule SwedishHolidays.CalendarDay do
   end
 
   def new_years_day(year) do
-    create(:new_years_day, SwedishDate.new(year, 1, 1), true)
+    create(:new_years_day, Timex.to_date({year, 1, 1}), true)
   end
 
   def twelfth_day(year) do
-    create(:twelfth_day, SwedishDate.new(year, 1, 6), true)
+    create(:twelfth_day, Timex.to_date({year, 1, 6}), true)
   end
 
   def maundy_thursday(year) do
     date = good_friday(year).date
-    |> Timex.subtract(Time.to_timestamp(1, :days))
+    |> Timex.subtract(Timex.Duration.from_days(1))
 
     create(:maundy_thursday, date, false)
   end
 
   def good_friday(year) do
     date = easter_day(year).date
-    |> Timex.subtract(Time.to_timestamp(2, :days))
+    |> Timex.subtract(Timex.Duration.from_days(2))
 
     create(:good_friday, date, true)
   end
 
   def easter_eve(year) do
     date = easter_day(year).date
-    |> Timex.subtract(Time.to_timestamp(1, :days))
+    |> Timex.subtract(Timex.Duration.from_days(1))
 
     create(:easter_eve, date, false)
   end
@@ -123,44 +128,44 @@ defmodule SwedishHolidays.CalendarDay do
       day = day - 31
     end
 
-    create(:easter_day, SwedishDate.new(year, month, day), true)
+    create(:easter_day, Timex.to_date({year, month, day}), true)
   end
 
   def easter_monday(year) do
     date = easter_day(year).date
-    |> Timex.add(Time.to_timestamp(1, :days))
+    |> Timex.add(Timex.Duration.from_days(1))
 
     create(:easter_monday, date, true)
   end
 
   def first_of_may(year) do
-    create(:first_of_may, SwedishDate.new(year, 5, 1), true)
+    create(:first_of_may, Timex.to_date({year, 5, 1}), true)
   end
 
   def ascension_day(year) do
     date = easter_day(year).date
-    |> Timex.add(Time.to_timestamp((5 * 7) + 4, :days))
+    |> Timex.add(Timex.Duration.from_days((5 * 7) + 4))
 
     create(:ascension_day, date, true)
   end
 
   def whitsun_eve(year) do
     date = whitsun_day(year).date
-    |> Timex.subtract(Time.to_timestamp(1, :days))
+    |> Timex.subtract(Timex.Duration.from_days(1))
 
     create(:whitsun_eve, date, false)
   end
 
   def whitsun_day(year) do
     date = easter_day(year).date
-    |> Timex.add(Time.to_timestamp(7 * 7, :days))
+    |> Timex.add(Timex.Duration.from_days(7 * 7))
 
     create(:whitsun_day, date, true)
   end
 
   def whit_monday(year) do
     date = whitsun_day(year).date
-    |> Timex.add(Time.to_timestamp(1, :days))
+    |> Timex.add(Timex.Duration.from_days(1))
 
     red_day = year <= 2004
 
@@ -170,50 +175,74 @@ defmodule SwedishHolidays.CalendarDay do
   def national_day(year) do
     red_day = year >= 2005
 
-    create(:national_day, SwedishDate.new(year, 6, 6), red_day)
+    create(:national_day, Timex.to_date({year, 6, 6}), red_day)
   end
 
   def midsummer_eve(year) do
-    date = midsummer_day(year).date
-    |> Timex.subtract(Time.to_timestamp(1, :days))
+    date =
+      midsummer_day(year).date
+      |> Timex.subtract(Timex.Duration.from_days(1))
 
     create(:midsummer_eve, date, false)
   end
 
   def midsummer_day(year) do
-    date = SwedishDate.new(year, 06, 20)
-
-    date =
-      date
-      |> Timex.add(Time.to_timestamp(6 - Timex.weekday(date), :days))
+    start_date = Timex.to_date({year, 6, 20})
+    date = Timex.add(start_date, Timex.Duration.from_days(6 - (Timex.weekday(start_date))))
 
     create(:midsummer_day, date, true)
   end
 
   def all_saints_day(year) do
-    date = SwedishDate.new(year, 10, 31)
+    start_date = Timex.to_date({year, 10, 31})
 
-    date =
-      date
-      |> Timex.add(Time.to_timestamp(6 - Timex.weekday(date), :days))
+    date = Timex.add(start_date, Timex.Duration.from_days(6 - Timex.weekday(start_date)))
 
     create(:all_saints_day, date, true)
   end
 
   def christmas_eve(year) do
-    create(:christmas_eve, SwedishDate.new(year, 12, 24), false)
+    create(:christmas_eve, Timex.to_date({year, 12, 24}), false)
   end
 
   def christmas_day(year) do
-    create(:christmas_day, SwedishDate.new(year, 12, 25), true)
+    create(:christmas_day, Timex.to_date({year, 12, 25}), true)
   end
 
   def boxing_day(year) do
-    create(:boxing_day, SwedishDate.new(year, 12, 26), true)
+    create(:boxing_day, Timex.to_date({year, 12, 26}), true)
   end
 
   def new_years_eve(year) do
-    create(:new_years_eve, SwedishDate.new(year, 12, 31), false)
+    create(:new_years_eve, Timex.to_date({year, 12, 31}), false)
+  end
+
+
+  def matching_filters2(calendar_day) do
+    [
+      :day_after_red_day_not_monday,
+      :day_before_red_day_not_saturday,
+      :red_day_not_sunday,
+      :red_day,
+      :friday_after_red_day,
+      :monday_before_red_day,
+      :day_before_red_day,
+      :day_after_red_day,
+      :sunday,
+      :saturday,
+      :friday,
+      :thursday,
+      :wednesday,
+      :tuesday,
+      :monday,
+      :monday_to_thursday,
+      :weekend,
+      :weekday,
+      :any_day
+    ]
+    |> Enum.each(fn(f) ->
+
+    end)
   end
 
   def matching_filters(calendar_day) do
@@ -383,11 +412,11 @@ defmodule SwedishHolidays.CalendarDay do
   end
 
   defp previous_calendar_day(calendar_day) do
-    CalendarDay.find(Timex.subtract(calendar_day.date, Time.to_timestamp(1, :days)))
+    CalendarDay.find(Timex.subtract(calendar_day.date, Timex.Duration.from_days(1)))
   end
 
   defp next_calendar_day(calendar_day) do
-    CalendarDay.find(Timex.add(calendar_day.date, Time.to_timestamp(1, :days)))
+    CalendarDay.find(Timex.add(calendar_day.date, Timex.Duration.from_days(1)))
   end
 
   defp other(date) do

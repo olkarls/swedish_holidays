@@ -1,5 +1,7 @@
 defmodule FilterCriteria do
-
+  @moduledoc """
+  """
+  
   def day_after_red_day_not_monday do
     {:day_after_red_day_not_monday, 2000}
   end

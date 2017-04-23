@@ -11,8 +11,8 @@ defmodule CalendarDayTest do
   end
 
   test "find whole year" do
-    from = SwedishDate.new(2015, 01, 01)
-    to = SwedishDate.new(2015, 12, 31)
+    from = CalendarDay.find(2015, 01, 01)
+    to = CalendarDay.find(2015, 12, 31)
 
     days = CalendarDay.find(from, to)
 
@@ -20,8 +20,8 @@ defmodule CalendarDayTest do
   end
 
   test "find whole leap year" do
-    from = SwedishDate.new(2016, 01, 01)
-    to = SwedishDate.new(2016, 12, 31)
+    from = CalendarDay.find(2016, 01, 01)
+    to = CalendarDay.find(2016, 12, 31)
 
     days = CalendarDay.find(from, to)
 
@@ -29,8 +29,8 @@ defmodule CalendarDayTest do
   end
 
   test "find range" do
-    from = SwedishDate.new(2015, 11, 30)
-    to = SwedishDate.new(2015, 12, 06)
+    from = CalendarDay.find(2015, 11, 30)
+    to = CalendarDay.find(2015, 12, 06)
 
     days = CalendarDay.find(from, to)
 
@@ -38,66 +38,61 @@ defmodule CalendarDayTest do
   end
 
   test "find monday" do
-    day = CalendarDay.find(SwedishDate.new(2015, 12, 7))
+    day =
+      CalendarDay.find(2015, 12, 7)
 
     assert day.code == :monday
-    assert day.date == SwedishDate.new(2015, 12, 7)
+    assert day.date == CalendarDay.find(2015, 12, 7).date
     assert day.red_day == false
   end
 
   test "find tuesday" do
-    day = CalendarDay.find(SwedishDate.new(2015, 12, 8))
+    day = CalendarDay.find(2015, 12, 8)
 
     assert day.code == :tuesday
-    assert day.date == SwedishDate.new(2015, 12, 8)
+    assert day.date == CalendarDay.find(2015, 12, 8)
     assert day.red_day == false
   end
 
   test "find wednesday" do
-    day = CalendarDay.find(SwedishDate.new(2015, 12, 9))
+    day = CalendarDay.find(2015, 12, 9)
 
     assert day.code == :wednesday
-    assert day.date == SwedishDate.new(2015, 12, 9)
     assert day.red_day == false
   end
 
   test "find thursday" do
-    day = CalendarDay.find(SwedishDate.new(2015, 12, 10))
+    day = CalendarDay.find(2015, 12, 10)
 
     assert day.code == :thursday
-    assert day.date == SwedishDate.new(2015, 12, 10)
     assert day.red_day == false
   end
 
   test "find friday" do
-    day = CalendarDay.find(SwedishDate.new(2015, 12, 11))
+    day = CalendarDay.find(2015, 12, 11)
 
     assert day.code == :friday
-    assert day.date == SwedishDate.new(2015, 12, 11)
     assert day.red_day == false
   end
 
   test "find saturday" do
-    day = CalendarDay.find(SwedishDate.new(2015, 12, 12))
+    day = CalendarDay.find(2015, 12, 12)
 
     assert day.code == :saturday
-    assert day.date == SwedishDate.new(2015, 12, 12)
     assert day.red_day == false
   end
 
   test "find sunday" do
-    day = CalendarDay.find(SwedishDate.new(2015, 12, 13))
+    day = CalendarDay.find(2015, 12, 13)
 
     assert day.code == :sunday
-    assert day.date == SwedishDate.new(2015, 12, 13)
     assert day.red_day == true
   end
 
   test "find among holidays" do
-    day = CalendarDay.find(SwedishDate.new(2015, 4, 4))
+    day = CalendarDay.find(2015, 4, 4)
 
     assert day.code == :easter_eve
-    assert day.date == SwedishDate.new(2015, 4, 4)
     assert day.red_day == false
   end
 
@@ -111,7 +106,6 @@ defmodule CalendarDayTest do
     day = CalendarDay.new_years_day(2015)
 
     assert day.code == :new_years_day
-    assert day.date == SwedishDate.new(2015, 1, 1)
     assert day.red_day == true
   end
 
@@ -119,7 +113,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.twelfth_day(2015)
 
     assert day.code == :twelfth_day
-    assert day.date == SwedishDate.new(2015, 1, 6)
+    assert day.date == CalendarDay.create(2015, 1, 6)
     assert day.red_day == true
   end
 
@@ -127,7 +121,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.maundy_thursday(2015)
 
     assert day.code == :maundy_thursday
-    assert day.date == SwedishDate.new(2015, 4, 2)
+    assert day.date == CalendarDay.create(2015, 4, 2)
     assert day.red_day == false
   end
 
@@ -135,7 +129,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.good_friday(2015)
 
     assert day.code == :good_friday
-    assert day.date == SwedishDate.new(2015, 4, 3)
+    assert day.date == CalendarDay.create(2015, 4, 3)
     assert day.red_day == true
   end
 
@@ -143,7 +137,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.easter_eve(2015)
 
     assert day.code == :easter_eve
-    assert day.date == SwedishDate.new(2015, 4, 4)
+    assert day.date == CalendarDay.create(2015, 4, 4)
     assert day.red_day == false
   end
 
@@ -151,7 +145,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.easter_day(2015)
 
     assert day.code == :easter_day
-    assert day.date == SwedishDate.new(2015, 4, 5)
+    assert day.date == CalendarDay.create(2015, 4, 5)
     assert day.red_day == true
   end
 
@@ -159,7 +153,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.easter_day(2016)
 
     assert day.code == :easter_day
-    assert day.date == SwedishDate.new(2016, 3, 27)
+    assert day.date == Timex.to_date({2016, 3, 27})
     assert day.red_day == true
   end
 
@@ -167,7 +161,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.easter_day(2025)
 
     assert day.code == :easter_day
-    assert day.date == SwedishDate.new(2025, 4, 20)
+    assert day.date == Timex.to_date({2025, 4, 20})
     assert day.red_day == true
   end
 
@@ -175,7 +169,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.easter_day(2004)
 
     assert day.code == :easter_day
-    assert day.date == SwedishDate.new(2004, 4, 11)
+    assert day.date == Timex.to_date({2004, 4, 11})
     assert day.red_day == true
   end
 
@@ -183,7 +177,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.easter_monday(2015)
 
     assert day.code == :easter_monday
-    assert day.date == SwedishDate.new(2015, 4, 6)
+    assert day.date == Timex.to_date({2015, 4, 6})
     assert day.red_day == true
   end
 
@@ -191,7 +185,8 @@ defmodule CalendarDayTest do
     day = CalendarDay.first_of_may(2015)
 
     assert day.code == :first_of_may
-    assert day.date == SwedishDate.new(2015, 5, 1)
+
+    assert day.date == Timex.to_date({2015, 5, 1})
     assert day.red_day == true
   end
 
@@ -199,7 +194,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.ascension_day(2015)
 
     assert day.code == :ascension_day
-    assert day.date == SwedishDate.new(2015, 5, 14)
+    assert day.date == Timex.to_date({2015, 5, 14})
     assert day.red_day == true
   end
 
@@ -207,7 +202,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.whitsun_eve(2015)
 
     assert day.code == :whitsun_eve
-    assert day.date == SwedishDate.new(2015, 5, 23)
+    assert day.date == Timex.to_date({2015, 5, 23})
     assert day.red_day == false
   end
 
@@ -215,7 +210,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.whitsun_day(2015)
 
     assert day.code == :whitsun_day
-    assert day.date == SwedishDate.new(2015, 5, 24)
+    assert day.date == Timex.to_date({2015, 5, 24})
     assert day.red_day == true
   end
 
@@ -223,7 +218,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.whit_monday(2015)
 
     assert day.code == :whit_monday
-    assert day.date == SwedishDate.new(2015, 5, 25)
+    assert day.date == Timex.to_date({2015, 5, 25})
     assert day.red_day == false
   end
 
@@ -231,7 +226,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.whit_monday(2004)
 
     assert day.code == :whit_monday
-    assert day.date == SwedishDate.new(2004, 5, 31)
+    assert day.date == Timex.to_date({2004, 5, 31})
     assert day.red_day == true
   end
 
@@ -239,7 +234,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.national_day(2015)
 
     assert day.code == :national_day
-    assert day.date == SwedishDate.new(2015, 6, 6)
+    assert day.date == Timex.to_date({2015, 6, 6})
     assert day.red_day == true
   end
 
@@ -247,7 +242,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.national_day(2004)
 
     assert day.code == :national_day
-    assert day.date == SwedishDate.new(2004, 6, 6)
+    assert day.date == Timex.to_date({2004, 6, 6})
     assert day.red_day == false
   end
 
@@ -255,7 +250,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.midsummer_eve(2015)
 
     assert day.code == :midsummer_eve
-    assert day.date == SwedishDate.new(2015, 6, 19)
+    assert day.date == Timex.to_date({2015, 6, 19})
     assert day.red_day == false
   end
 
@@ -263,7 +258,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.midsummer_day(2015)
 
     assert day.code == :midsummer_day
-    assert day.date == SwedishDate.new(2015, 6, 20)
+    assert day.date == Timex.to_date({2015, 6, 20})
     assert day.red_day == true
   end
 
@@ -271,7 +266,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.midsummer_day(2016)
 
     assert day.code == :midsummer_day
-    assert day.date == SwedishDate.new(2016, 6, 25)
+    assert day.date == Timex.to_date({2016, 6, 25})
     assert day.red_day == true
   end
 
@@ -279,7 +274,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.all_saints_day(2015)
 
     assert day.code == :all_saints_day
-    assert day.date == SwedishDate.new(2015, 10, 31)
+    assert day.date == Timex.to_date({2015, 10, 31})
     assert day.red_day == true
   end
 
@@ -287,7 +282,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.all_saints_day(2016)
 
     assert day.code == :all_saints_day
-    assert day.date == SwedishDate.new(2016, 11, 5)
+    assert day.date == Timex.to_date({2016, 11, 5})
     assert day.red_day == true
   end
 
@@ -295,7 +290,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.christmas_eve(2015)
 
     assert day.code == :christmas_eve
-    assert day.date == SwedishDate.new(2015, 12, 24)
+    assert day.date == Timex.to_date({2015, 12, 24})
     assert day.red_day == false
   end
 
@@ -303,7 +298,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.christmas_day(2015)
 
     assert day.code == :christmas_day
-    assert day.date == SwedishDate.new(2015, 12, 25)
+    assert day.date == Timex.to_date({2015, 12, 25})
     assert day.red_day == true
   end
 
@@ -311,7 +306,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.boxing_day(2015)
 
     assert day.code == :boxing_day
-    assert day.date == SwedishDate.new(2015, 12, 26)
+    assert day.date == Timex.to_date({2015, 12, 26})
     assert day.red_day == true
   end
 
@@ -319,14 +314,13 @@ defmodule CalendarDayTest do
     day = CalendarDay.new_years_eve(2015)
 
     assert day.code == :new_years_eve
-    assert day.date == SwedishDate.new(2015, 12, 31)
+    assert day.date == Timex.to_date({2015, 12, 31})
     assert day.red_day == false
   end
 
   test "matches on monday" do
     matching =
-      SwedishDate.new(2015, 12, 7)
-      |> CalendarDay.find
+      CalendarDay.find(2015, 12, 7)
       |> CalendarDay.matching_filters
 
     assert FilterCriteria.any_day in matching
@@ -338,8 +332,7 @@ defmodule CalendarDayTest do
 
   test "matches on tuesday" do
     matching =
-      SwedishDate.new(2015, 12, 8)
-      |> CalendarDay.find
+      CalendarDay.find(2015, 12, 8)
       |> CalendarDay.matching_filters
 
     assert FilterCriteria.any_day in matching
@@ -350,8 +343,7 @@ defmodule CalendarDayTest do
 
   test "matches on wednesday" do
     matching =
-      SwedishDate.new(2015, 12, 9)
-      |> CalendarDay.find
+      CalendarDay.find(2015, 12, 9)
       |> CalendarDay.matching_filters
 
     assert FilterCriteria.any_day in matching
@@ -362,8 +354,7 @@ defmodule CalendarDayTest do
 
   test "matches on thursday" do
     matching =
-      SwedishDate.new(2015, 12, 10)
-      |> CalendarDay.find
+      CalendarDay.find(2015, 12, 10)
       |> CalendarDay.matching_filters
 
     assert FilterCriteria.any_day in matching
@@ -374,8 +365,7 @@ defmodule CalendarDayTest do
 
   test "matches on friday" do
     matching =
-      SwedishDate.new(2015, 12, 11)
-      |> CalendarDay.find
+      CalendarDay.find(2015, 12, 11)
       |> CalendarDay.matching_filters
 
     assert FilterCriteria.any_day in matching
@@ -385,8 +375,7 @@ defmodule CalendarDayTest do
 
   test "matches on saturday" do
     matching =
-      SwedishDate.new(2015, 12, 12)
-      |> CalendarDay.find
+      CalendarDay.find(2015, 12, 12)
       |> CalendarDay.matching_filters
 
       assert FilterCriteria.any_day in matching
@@ -398,8 +387,7 @@ defmodule CalendarDayTest do
 
   test "matches on sunday" do
     matching =
-      SwedishDate.new(2015, 12, 13)
-      |> CalendarDay.find
+      CalendarDay.find(2015, 12, 13)
       |> CalendarDay.matching_filters
 
       assert FilterCriteria.any_day in matching
@@ -423,8 +411,7 @@ defmodule CalendarDayTest do
 
   test "friday after red day" do
     matching =
-      SwedishDate.new(2015, 01, 02)
-      |> CalendarDay.find
+      CalendarDay.find(2015, 01, 02)
       |> CalendarDay.matching_filters
 
     assert FilterCriteria.friday_after_red_day in matching
@@ -432,48 +419,35 @@ defmodule CalendarDayTest do
 
   test "monday before red day" do
     matching =
-      SwedishDate.new(2017, 06, 05)
-      |> CalendarDay.find
+      CalendarDay.find(2017, 06, 05)
       |> CalendarDay.matching_filters
 
     assert FilterCriteria.monday_before_red_day in matching
   end
 
   test "day is matching filter" do
-    day =
-      SwedishDate.new(2015, 12, 10)
-      |> CalendarDay.find
-
+    day = CalendarDay.find(2015, 12, 10)
     assert CalendarDay.matches?(day, FilterCriteria.thursday)
   end
 
   test "day is not matching filter" do
-    day =
-      SwedishDate.new(2015, 12, 10)
-      |> CalendarDay.find
-
+    day = CalendarDay.find(2015, 12, 10)
     refute CalendarDay.matches?(day, FilterCriteria.weekend)
   end
 
   test "day_after_red_day_not_monday" do
-    day =
-      SwedishDate.new(2016, 03, 29)
-      |> CalendarDay.find
-
+    day = CalendarDay.find(2016, 03, 29)
     assert CalendarDay.matches?(day, FilterCriteria.day_after_red_day_not_monday)
   end
 
   test "day_before_red_day_not_saturday" do
-    day =
-      SwedishDate.new(2016, 05, 4)
-      |> CalendarDay.find
-
+    day = CalendarDay.find(2016, 05, 4)
     assert CalendarDay.matches?(day, FilterCriteria.day_before_red_day_not_saturday)
   end
 
   test "filter day range by any match" do
-    from = SwedishDate.new(2016, 01, 01)
-    to = SwedishDate.new(2016, 01, 31)
+    from = CalendarDay.find(2016, 01, 01)
+    to = CalendarDay.find(2016, 01, 31)
 
     days = CalendarDay.find(from, to)
     filters = [FilterCriteria.day_after_red_day, FilterCriteria.red_day_not_sunday]
@@ -483,8 +457,8 @@ defmodule CalendarDayTest do
   end
 
   test "filter day range by all filters" do
-    from = SwedishDate.new(2016, 01, 01)
-    to = SwedishDate.new(2016, 01, 31)
+    from = CalendarDay.find(2016, 01, 01)
+    to = CalendarDay.find(2016, 01, 31)
 
     days = CalendarDay.find(from, to)
     filters = [FilterCriteria.friday, FilterCriteria.red_day_not_sunday]
@@ -495,8 +469,7 @@ defmodule CalendarDayTest do
 
   test "to string" do
     string =
-      SwedishDate.new(2015, 12, 10)
-      |> CalendarDay.find
+      CalendarDay.find(2015, 12, 10)
       |> CalendarDay.to_string
 
     assert string == "2015-12-10, code: thursday, red_day: false"

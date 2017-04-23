@@ -8,7 +8,7 @@ defmodule SwedishHolidays.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      test_coverage: [tool: Coverex.Task],
-     deps: deps]
+     deps: deps()]
   end
 
   # Configuration for the OTP application
@@ -29,7 +29,7 @@ defmodule SwedishHolidays.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:timex, "> 0.0.0"},
+      {:timex, "~> 3.0"},
       {:coverex, "> 0.0.0"},
       {:credo, "> 0.0.0"},
       {:dialyxir, "~> 0.3", only: [:dev, :test]}
