@@ -29,9 +29,9 @@ defmodule SwedishHolidays.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:timex, "~> 3.0"},
-      {:coverex, "> 0.0.0"},
-      {:credo, "> 0.0.0"},
+      {:timex, "~> 3.1.13"},
+      {:coverex, "~> 1.4.10", only: :test},
+      {:credo, "~> 0.7.3", only: [:dev, :test]},
       {:dialyxir, "~> 0.3", only: [:dev, :test]}
     ]
   end

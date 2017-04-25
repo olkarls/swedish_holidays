@@ -11,8 +11,8 @@ defmodule CalendarDayTest do
   end
 
   test "find whole year" do
-    from = CalendarDay.find(2015, 01, 01)
-    to = CalendarDay.find(2015, 12, 31)
+    from = Timex.to_date({2015, 01, 01})
+    to = Timex.to_date({2015, 12, 31})
 
     days = CalendarDay.find(from, to)
 
@@ -20,8 +20,8 @@ defmodule CalendarDayTest do
   end
 
   test "find whole leap year" do
-    from = CalendarDay.find(2016, 01, 01)
-    to = CalendarDay.find(2016, 12, 31)
+    from = Timex.to_date({2016, 01, 01})
+    to = Timex.to_date({2016, 12, 31})
 
     days = CalendarDay.find(from, to)
 
@@ -32,7 +32,7 @@ defmodule CalendarDayTest do
     from = CalendarDay.find(2015, 11, 30)
     to = CalendarDay.find(2015, 12, 06)
 
-    days = CalendarDay.find(from, to)
+    days = CalendarDay.find(from.date, to.date)
 
     assert Enum.count(days) == 7
   end
@@ -42,7 +42,6 @@ defmodule CalendarDayTest do
       CalendarDay.find(2015, 12, 7)
 
     assert day.code == :monday
-    assert day.date == CalendarDay.find(2015, 12, 7).date
     assert day.red_day == false
   end
 
@@ -50,7 +49,6 @@ defmodule CalendarDayTest do
     day = CalendarDay.find(2015, 12, 8)
 
     assert day.code == :tuesday
-    assert day.date == CalendarDay.find(2015, 12, 8)
     assert day.red_day == false
   end
 
@@ -97,7 +95,7 @@ defmodule CalendarDayTest do
   end
 
   test "all" do
-    days = CalendarDay.all(2015)
+    days = CalendarDay.find(2015)
 
     assert Enum.count(days) == 20
   end
@@ -113,7 +111,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.twelfth_day(2015)
 
     assert day.code == :twelfth_day
-    assert day.date == CalendarDay.create(2015, 1, 6)
+    assert day.date == Timex.to_date({2015, 1, 6})
     assert day.red_day == true
   end
 
@@ -121,7 +119,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.maundy_thursday(2015)
 
     assert day.code == :maundy_thursday
-    assert day.date == CalendarDay.create(2015, 4, 2)
+    assert day.date == Timex.to_date({2015, 4, 2})
     assert day.red_day == false
   end
 
@@ -129,7 +127,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.good_friday(2015)
 
     assert day.code == :good_friday
-    assert day.date == CalendarDay.create(2015, 4, 3)
+    assert day.date == Timex.to_date({2015, 4, 3})
     assert day.red_day == true
   end
 
@@ -137,7 +135,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.easter_eve(2015)
 
     assert day.code == :easter_eve
-    assert day.date == CalendarDay.create(2015, 4, 4)
+    assert day.date == Timex.to_date({2015, 4, 4})
     assert day.red_day == false
   end
 
@@ -145,7 +143,7 @@ defmodule CalendarDayTest do
     day = CalendarDay.easter_day(2015)
 
     assert day.code == :easter_day
-    assert day.date == CalendarDay.create(2015, 4, 5)
+    assert day.date == Timex.to_date({2015, 4, 5})
     assert day.red_day == true
   end
 
@@ -446,8 +444,8 @@ defmodule CalendarDayTest do
   end
 
   test "filter day range by any match" do
-    from = CalendarDay.find(2016, 01, 01)
-    to = CalendarDay.find(2016, 01, 31)
+    from = Timex.to_date({2016, 01, 01})
+    to = Timex.to_date({2016, 01, 31})
 
     days = CalendarDay.find(from, to)
     filters = [FilterCriteria.day_after_red_day, FilterCriteria.red_day_not_sunday]
@@ -457,8 +455,8 @@ defmodule CalendarDayTest do
   end
 
   test "filter day range by all filters" do
-    from = CalendarDay.find(2016, 01, 01)
-    to = CalendarDay.find(2016, 01, 31)
+    from = Timex.to_date({2016, 01, 01})
+    to = Timex.to_date({2016, 01, 31})
 
     days = CalendarDay.find(from, to)
     filters = [FilterCriteria.friday, FilterCriteria.red_day_not_sunday]

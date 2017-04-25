@@ -6,61 +6,8 @@ defmodule SwedishHolidays.CalendarDay do
 
   defstruct code: nil, date: nil, red_day: nil
 
-  def find(year, month, day) do
-    Timex.to_date({year, month, day})
-    |> find
-  end
-
-  @spec find(Timex.Date) :: %CalendarDay{}
-  def find(date) do
-    day =
-      all(date.year)
-      |> Enum.filter(fn(d) -> d.date == date end)
-      |> List.first
-
-    case day do
-      nil -> other(date)
-      true -> day
-    end
-  end
-
-  @spec find(Timex.Date, Timex.Date) :: [%CalendarDay{}]
-  def find(from, to) do
-    0..Timex.diff(from, to, :days)
-    |> Enum.map(fn(n) ->
-      find(Timex.add(from, Timex.Duration.from_days(n)))
-    end)
-  end
-
-  def match_any(calendar_days, day_filters) do
-    Enum.map(day_filters, fn(filter) ->
-      Enum.filter(calendar_days, fn(day) ->
-        CalendarDay.matches?(day, filter)
-      end)
-    end)
-    |> List.flatten
-    |> Enum.sort(&(&1.date < &2.date))
-  end
-
-  def match_all(calendar_days, day_filters) do
-    Enum.map(calendar_days, fn(day) ->
-      is_match = Enum.map(day_filters, fn(filter) ->
-        CalendarDay.matches?(day, filter)
-      end)
-      unless false in is_match do
-        day
-      end
-    end)
-    |> Enum.filter(fn(d) ->
-      d != nil
-    end)
-  end
-
-  def matches?(calendar_day, day_filter) do
-    day_filter in matching_filters(calendar_day)
-  end
-
-  def all(year) do
+  @spec find(Integer) :: [%CalendarDay{}]
+  def find(year) when is_integer(year) do
     [
        new_years_day(year),
        twelfth_day(year),
@@ -83,6 +30,64 @@ defmodule SwedishHolidays.CalendarDay do
        boxing_day(year),
        new_years_eve(year)
      ]
+  end
+
+  @spec find(Timex.Date) :: %CalendarDay{}
+  def find(date) do
+    matches =
+      date.year
+      |> find
+      |> Enum.filter(fn(d) -> d.date == date end)
+
+    if Enum.any?(matches) do
+      List.first(matches)
+    else
+      other(date)
+    end
+  end
+
+  @spec find(Integer, Integer, Integer) :: %CalendarDay{}
+  def find(year, month, day) do
+    find(Timex.to_date({year, month, day}))
+  end
+
+  @spec find(Timex.Date, Timex.Date) :: [%CalendarDay{}]
+  def find(from, to) do
+    days =
+    0..Timex.diff(to, from, :days)
+    |> Enum.map(fn(n) ->
+      find(Timex.add(from, Timex.Duration.from_days(n)))
+    end)
+  end
+
+  def match_any(calendar_days, day_filters) do
+    day_filters
+    |> Enum.map(fn(filter) ->
+        Enum.filter(calendar_days, fn(day) ->
+          CalendarDay.matches?(day, filter)
+        end)
+      end)
+    |> List.flatten
+    |> Enum.sort(&(&1.date < &2.date))
+  end
+
+  def match_all(calendar_days, day_filters) do
+    calendar_days
+    |> Enum.map(fn(day) ->
+        is_match = Enum.map(day_filters, fn(filter) ->
+        CalendarDay.matches?(day, filter)
+      end)
+      unless false in is_match do
+        day
+      end
+    end)
+    |> Enum.filter(fn(d) ->
+      d != nil
+    end)
+  end
+
+  def matches?(calendar_day, day_filter) do
+    day_filter in matching_filters(calendar_day)
   end
 
   def new_years_day(year) do
@@ -108,8 +113,9 @@ defmodule SwedishHolidays.CalendarDay do
   end
 
   def easter_eve(year) do
-    date = easter_day(year).date
-    |> Timex.subtract(Timex.Duration.from_days(1))
+    date =
+      easter_day(year).date
+      |> Timex.subtract(Timex.Duration.from_days(1))
 
     create(:easter_eve, date, false)
   end
